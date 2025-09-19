@@ -2,7 +2,11 @@
   "name": "sarv-laxmi-sales",
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix client\" \"npm start --prefix server\""
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm start --prefix server\"",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
@@ -58,6 +62,7 @@
     "picomatch": "^2.3.1",
     "pkg-dir": "^4.2.0",
     "queue-microtask": "^1.2.3",
+    "react-scripts": "^5.0.1",
     "require-directory": "^2.1.1",
     "reusify": "^1.1.0",
     "run-parallel": "^1.2.0",
