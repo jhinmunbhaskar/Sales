@@ -7,8 +7,8 @@ const containerStyle = {
 };
 
 const center = {
-  lat: 28.4965352527687, // replace with your latitude
-  lng: 77.16045185894953  // replace with your longitude
+  lat: 28.4965352527687, // latitude
+  lng: 77.16045185894953  // longitude
 };
 
 export default function MapComponent() {

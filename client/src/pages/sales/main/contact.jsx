@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import axiosInstance from '../../../api/axiosInstance';
+import API_PATHS from '../../../api/apiUrl';
 
 function Contact() {
   const [formData, setFormData] = useState({
     name: "",
+    landingNo: "",
     mobile: "",
     email: "",
+    extension: "",
     comment: "",
   });
+
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -15,9 +21,21 @@ function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Submitted: " + JSON.stringify(formData));
+
+    try {
+      const response = await axiosInstance.post(API_PATHS.ContactPost, formData);
+      
+      if (response.status === 200 || response.status === 201) {
+        setMessage("✅ Your message has been sent!");
+      } else {
+        setMessage("❌ Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      setMessage("❌ Error: " + (error.response?.data?.message || error.message));
+    }
   };
 
   return (
@@ -27,21 +45,13 @@ function Contact() {
         <div className="col-md-6">
           <h2>CONTACT US</h2>
           <p>
-            <strong>ADDRESS:</strong>
-            <br />
-            Basement Floor, At-110, Main Market Road, Sultanpur, Near Peer Baba,
-            <br />
-            New Delhi - 110030, INDIA.
-            <br />
+            <strong>ADDRESS:</strong><br />
+            Basement Floor, At-110, Main Market Road, Sultanpur, Near Peer Baba,<br />
+            New Delhi - 110030, INDIA.<br />
             <strong>GST TIN:</strong> 07BKWPM4815J1ZJ
           </p>
-          <p>
-            <strong>Sales Email:</strong>{" "}
-            sarvlaxmi2019@gmail.com,otlseals@gmail.com
-          </p>
-          <p>
-            <strong>Sales Phone / WhatsApp:</strong> +91-955-5541-415
-          </p>
+          <p><strong>Sales Email:</strong> sarvlaxmi2019@gmail.com, otlseals@gmail.com</p>
+          <p><strong>Sales Phone / WhatsApp:</strong> +91-955-5541-415</p>
         </div>
 
         {/* Right Panel - Form */}
@@ -49,9 +59,7 @@ function Contact() {
           <h3 className="mb-3">Request for a Call Back</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                NAME <span style={{ color: "red" }}>*</span>
-              </label>
+              <label htmlFor="name" className="form-label">NAME <span style={{ color: "red" }}>*</span></label>
               <input
                 type="text"
                 className="form-control"
@@ -62,6 +70,7 @@ function Contact() {
                 required
               />
             </div>
+
             <div className="mb-1">
               <label className="form-label">Landing No.</label>
               <input
@@ -72,14 +81,11 @@ function Contact() {
                 onChange={handleChange}
                 required
               />
-              <small className="text-muted">
-                Please prefix 0 before landing no.
-              </small>
+              <small className="text-muted">Please prefix 0 before landing no.</small>
             </div>
+
             <div className="mb-3">
-              <label htmlFor="mobile" className="form-label">
-                MOBILE NO <span style={{ color: "red" }}>*</span>
-              </label>
+              <label htmlFor="mobile" className="form-label">MOBILE NO <span style={{ color: "red" }}>*</span></label>
               <input
                 type="tel"
                 className="form-control"
@@ -92,9 +98,7 @@ function Contact() {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                EMAIL ID
-              </label>
+              <label htmlFor="email" className="form-label">EMAIL ID</label>
               <input
                 type="email"
                 className="form-control"
@@ -104,6 +108,7 @@ function Contact() {
                 onChange={handleChange}
               />
             </div>
+
             <div className="mb-3">
               <label className="form-label">Extension</label>
               <input
@@ -116,9 +121,7 @@ function Contact() {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="comment" className="form-label">
-                COMMENT
-              </label>
+              <label htmlFor="comment" className="form-label">COMMENT</label>
               <textarea
                 className="form-control"
                 id="comment"
@@ -134,6 +137,8 @@ function Contact() {
                 Submit
               </button>
             </div>
+
+            {message && <p className="mt-3 text-center">{message}</p>}
           </form>
         </div>
       </div>

@@ -1,9 +1,11 @@
-import React from "react";
-import { useState } from "react";
-import { FaCheckCircle   } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaCheckCircle } from "react-icons/fa";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
-import "../../../index.css"
-export default function productQuatation() {
+import "../../../index.css";
+import axiosInstance from "../../../api/axiosInstance";
+import API_PATHS from "../../../api/apiUrl";
+
+export default function ProductQuatation() {
   const products = [
     { id: "RX-C102", img: "/productimg/camara.jpg" },
     { id: "RX-C103", img: "/productimg/bolt-seal.jpeg" },
@@ -15,45 +17,70 @@ export default function productQuatation() {
   ];
 
   const [selected, setSelected] = useState(null);
+  const [message, setMessage] = useState(null);
 
   const handleSelect = (id) => {
-    setSelected(id); // only one seal selected
+    setSelected(id);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
 
-    const data = {
-      seal: selected,
-      quantity: formData.get("quantity"),
-      colour: formData.get("colour"),
-      customization: formData.get("customization"),
-      location: formData.get("location"),
-      name: formData.get("name"),
-      company: formData.get("company"),
-      mobile: formData.get("mobile"),
-      whatsapp: formData.get("whatsapp"),
-      email: formData.get("email"),
+    if (!selected) {
+      setMessage("❌ Please select a seal.");
+      return;
+    }
+
+    const formData = {
+      sealType: selected,
+      quantityRange: e.target.quantity.value,
+      sealColour: e.target.colour.value,
+      customizationPrinting: e.target.customization.value,
+      deliveryLocation: e.target.location.value,
+      personName: e.target.name.value,
+      companyName: e.target.company.value,
+      mobileNo: e.target.mobile.value,
+      whatsAppNo: e.target.whatsapp.value,
+      emailId: e.target.email.value,
     };
 
-    console.log("Form Submitted:", data);
-    // TODO: send `data` to backend API
+    try {
+      const response = await axiosInstance.post(API_PATHS.Quatation, formData, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        setMessage("✅ Your message has been sent!");
+        e.target.reset();
+        setSelected(null);
+      } else {
+        setMessage("❌ Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      setMessage(
+        "❌ Error: " + (error.response?.data?.message || error.message)
+      );
+    }
+
+    console.log("Form Submitted:", formData);
   };
+
   return (
-    <>
-      <div className="container align-content-center align-items-center w-75 py-3">
-     <section className="p-3 thick-border ">
+    <div className="container align-content-center align-items-center w-75 py-3">
+      <section className="p-3 thick-border ">
         <div className="text-center mb-4">
-         <button className="btn-md w-50  align-items-center justify-content-center btn-arrow">
-    QUOTE REQUEST - OFFLINE BULK ORDER
-    <FaArrowRightArrowLeft  className="ms-2" />
-  </button>
+          <button className="btn-md w-50 align-items-center justify-content-center btn-arrow">
+            QUOTE REQUEST - OFFLINE BULK ORDER
+            <FaArrowRightArrowLeft className="ms-2" />
+          </button>
         </div>
 
         {/* Product Grid */}
         <div className="container mb-4">
-          <label className="fw-bold mb-3">SELECT THE SEAL <span className="starcolor">*</span></label>
+          <label className="fw-bold mb-3">
+            SELECT THE SEAL <span className="starcolor">*</span>
+          </label>
           <div className="row">
             {products.map((p, index) => (
               <div className="col-6 col-md-3 mb-4" key={index}>
@@ -88,7 +115,9 @@ export default function productQuatation() {
                 onSubmit={handleSubmit}
               >
                 <div className="mb-3">
-                  <label className="form-label">Quantity Range<span className="starcolor">*</span></label>
+                  <label className="form-label">
+                    Quantity Range<span className="starcolor">*</span>
+                  </label>
                   <select name="quantity" className="form-select" required>
                     <option value="">Select Quantity</option>
                     <option value="100-500">100 - 500</option>
@@ -145,20 +174,29 @@ export default function productQuatation() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Email ID <span className="starcolor">*</span></label>
+                  <label className="form-label">
+                    Email ID <span className="starcolor">*</span>
+                  </label>
                   <input type="email" name="email" className="form-control" />
-                  <span>PLEASE TYPE YOUR DOMAIN EMAIL ID TO GET REQUIRED INFORMATION OR TO AVOID SPAM / JUNK EMAIL.</span>
+                  <span>
+                    PLEASE TYPE YOUR DOMAIN EMAIL ID TO GET REQUIRED
+                    INFORMATION OR TO AVOID SPAM / JUNK EMAIL.
+                  </span>
                 </div>
 
-                <button type="submit" className="btn btn-primary align-items-center">
+                <button
+                  type="submit"
+                  className="btn btn-primary align-items-center"
+                >
                   Submit
                 </button>
+
+                {message && <p className="mt-3 text-center">{message}</p>}
               </form>
             </div>
           </div>
         </div>
       </section>
-      </div>
-    </>
+    </div>
   );
 }
